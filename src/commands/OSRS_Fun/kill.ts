@@ -1,13 +1,12 @@
 import { MessageAttachment } from 'discord.js';
-import { calcPercentOfNum } from 'e';
-import { CommandStore, KlasaMessage, KlasaUser } from 'klasa';
+import { CommandStore, KlasaMessage, KlasaUser, Stopwatch } from 'klasa';
 import { Bank } from 'oldschooljs';
 
 import { PerkTier } from '../../lib/constants';
 import { BotCommand } from '../../lib/structures/BotCommand';
 import { toTitleCase } from '../../lib/util';
 import getUsersPerkTier from '../../lib/util/getUsersPerkTier';
-import { KillWorkerArgs, piscinaPool, Workers } from '../../lib/workers';
+import { KillWorkerArgs, Workers } from '../../lib/workers';
 
 export default class extends BotCommand {
 	public constructor(store: CommandStore, file: string[], directory: string) {
@@ -58,6 +57,7 @@ export default class extends BotCommand {
 	}
 
 	async run(msg: KlasaMessage, [quantity, bossName]: [number, string]) {
+		const stopwatch = new Stopwatch();
 		const options: KillWorkerArgs[] = [];
 		if (quantity < 50_000) {
 			options.push({
@@ -97,6 +97,6 @@ export default class extends BotCommand {
 				msg.flagArgs
 			);
 
-		return msg.send(new MessageAttachment(image!, 'osbot.png'));
+		return msg.send(stopwatch.stop(), new MessageAttachment(image!, 'osbot.png'));
 	}
 }
