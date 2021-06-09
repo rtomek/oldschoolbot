@@ -1,11 +1,13 @@
 import { MessageAttachment } from 'discord.js';
+import { calcPercentOfNum } from 'e';
 import { CommandStore, KlasaMessage, KlasaUser } from 'klasa';
+import { Bank } from 'oldschooljs';
 
 import { PerkTier } from '../../lib/constants';
 import { BotCommand } from '../../lib/structures/BotCommand';
 import { toTitleCase } from '../../lib/util';
 import getUsersPerkTier from '../../lib/util/getUsersPerkTier';
-import { Workers } from '../../lib/workers';
+import { KillWorkerArgs, piscinaPool, Workers } from '../../lib/workers';
 
 export default class extends BotCommand {
 	public constructor(store: CommandStore, file: string[], directory: string) {
@@ -56,20 +58,40 @@ export default class extends BotCommand {
 	}
 
 	async run(msg: KlasaMessage, [quantity, bossName]: [number, string]) {
-		const result = await Workers.kill({
-			quantity,
-			bossName,
-			limit: this.determineKillLimit(msg.author)
-		});
+		const options: KillWorkerArgs[] = [];
+		if (quantity < 50_000) {
+			options.push({
+				quantity,
+				bossName,
+				limit: this.determineKillLimit(msg.author)
+			});
+		} else {
+			const threadCount = Math.floor(calcPercentOfNum(75, piscinaPool.options.maxThreads));
+			const threadedQuantity = Math.floor(quantity / threadCount) * threadCount;
+			for (let i = 0; i < threadCount; i++) {
+				let thisQty = threadedQuantity / threadCount;
+				if (i === threadCount - 1) {
+					console.log({ quantity, threadedQuantity });
+					thisQty += quantity - threadedQuantity;
+				}
+				options.push({
+					quantity: thisQty,
+					bossName,
+					limit: this.determineKillLimit(msg.author)
+				});
+			}
+		}
 
-		if (typeof result === 'string') {
-			return msg.send(result);
+		const results = await Promise.all(options.map(opts => Workers.kill(opts)));
+		const totalLoot = new Bank();
+		for (const bank of results) {
+			totalLoot.add(bank);
 		}
 
 		const { image } = await this.client.tasks
 			.get('bankImage')!
 			.generateBankImage(
-				result.bank,
+				totalLoot.bank,
 				`Loot from ${quantity.toLocaleString()} ${toTitleCase(bossName)}`,
 				true,
 				msg.flagArgs

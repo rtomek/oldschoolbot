@@ -1,4 +1,5 @@
 import { Bank } from 'oldschooljs';
+import { ItemBank } from 'oldschooljs/dist/meta/types';
 import { resolve } from 'path';
 import Piscina from 'piscina';
 
@@ -18,6 +19,6 @@ export const piscinaPool = new Piscina();
 export const Workers = {
 	casketOpen: (args: CasketWorkerArgs): Promise<[Bank, string]> =>
 		piscinaPool.runTask(args, resolve(__dirname, 'casket.worker.js')),
-	kill: (args: KillWorkerArgs): Promise<Bank | string> =>
+	kill: (args: KillWorkerArgs): Promise<ItemBank> =>
 		piscinaPool.runTask(args, resolve(__dirname, 'kill.worker.js'))
 };
