@@ -1,0 +1,19 @@
+import { Interaction } from 'discord.js';
+import { Event, EventStore } from 'klasa';
+
+export default class extends Event {
+	public constructor(store: EventStore, file: string[], directory: string) {
+		super(store, file, directory, {
+			once: false,
+			event: 'interaction'
+		});
+	}
+
+	async run(interaction: Interaction) {
+		if (interaction.isButton()) {
+			console.log(interaction);
+			await interaction.update({ components: [], content: 'You click da button!' });
+			interaction.channel?.send('hi');
+		}
+	}
+}

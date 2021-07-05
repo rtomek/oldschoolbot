@@ -1,5 +1,14 @@
-import { MessageAttachment, MessageEmbed, Permissions, TextChannel, WebhookClient } from 'discord.js';
-import { KlasaClient } from 'klasa';
+import {
+	MessageActionRow,
+	MessageAttachment,
+	MessageButton,
+	MessageEmbed,
+	MessageOptions,
+	Permissions,
+	TextChannel,
+	WebhookClient
+} from 'discord.js';
+import { KlasaClient, KlasaMessage } from 'klasa';
 import PQueue from 'p-queue';
 
 import { WebhookTable } from '../typeorm/WebhookTable.entity';
@@ -65,36 +74,34 @@ export async function sendToChannelID(
 		content?: string;
 		image?: Buffer | MessageAttachment;
 		embed?: MessageEmbed;
+		components?: MessageButton[];
 	}
-) {
-	queue.add(async () => {
+): Promise<null | KlasaMessage> {
+	return queue.add(async () => {
 		const channel = await resolveChannel(client, channelID);
-		if (!channel) return;
+		if (!channel) return null;
 
 		client.emit('log', `Sending to channelID[${channelID}].`);
 		let files = data.image ? [data.image] : undefined;
 		let embeds = [];
 		if (data.embed) embeds.push(data.embed);
+
+		let options: MessageOptions = { content: data.content, files, embeds };
+		if (data.components) options.components = [new MessageActionRow({ components: data.components })];
+
 		if (channel instanceof WebhookClient) {
 			try {
-				await channel.send({
-					content: data.content,
-					files,
-					embeds
-				});
+				return channel.send(options) as unknown as Promise<KlasaMessage>;
 			} catch (err: any) {
 				const error = err as Error;
 				if (error.message === 'Unknown Webhook') {
 					await deleteWebhook(channelID);
 					await sendToChannelID(client, channelID, data);
 				}
+				return null;
 			}
 		} else {
-			await channel.send({
-				content: data.content,
-				files,
-				embeds
-			});
+			return channel.send(options) as Promise<KlasaMessage>;
 		}
 	});
 }

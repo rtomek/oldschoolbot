@@ -1,4 +1,5 @@
-import { Message, MessageAttachment, MessageCollector, TextChannel } from 'discord.js';
+import { MessageAttachment, MessageButton, MessageCollector, TextChannel } from 'discord.js';
+import { deepClone } from 'e';
 import { KlasaClient, KlasaMessage, KlasaUser } from 'klasa';
 import { ItemBank } from 'oldschooljs/dist/meta/types';
 
@@ -8,7 +9,7 @@ import clueTiers from '../minions/data/clueTiers';
 import { triggerRandomEvent } from '../randomEvents';
 import { ClientSettings } from '../settings/types/ClientSettings';
 import { ActivityTaskOptions } from '../types/minions';
-import { channelIsSendable, generateContinuationChar, roll, stringMatches, updateGPTrackSetting } from '../util';
+import { channelIsSendable, generateContinuationChar, roll, updateGPTrackSetting } from '../util';
 import getUsersPerkTier from './getUsersPerkTier';
 import { sendToChannelID } from './webhook';
 
@@ -44,15 +45,27 @@ export async function handleTripFinish(
 		}
 	}
 
+	let components = [];
+
 	const clueReceived = loot ? clueTiers.find(tier => loot[tier.scrollID] > 0) : undefined;
 
 	if (clueReceived) {
 		message += `\n${Emoji.Casket} **You got a ${clueReceived.name} clue scroll** in your loot.`;
 		if (perkTier > PerkTier.One) {
 			message += ` Say \`c\` if you want to complete this ${clueReceived.name} clue now.`;
+			components.push(
+				new MessageButton()
+					.setStyle('SECONDARY')
+					.setCustomID(`do_${clueReceived.name}_clue`)
+					.setLabel('Do Clue Scroll')
+			);
 		} else {
 			message += 'You can get your minion to complete them using `+minion clue easy/medium/etc`';
 		}
+	}
+
+	if (perkTier > PerkTier.One) {
+		components.push(new MessageButton().setStyle('PRIMARY').setCustomID('repeat_trip').setLabel('Repeat Trip'));
 	}
 
 	const attachable = attachment
@@ -63,51 +76,52 @@ export async function handleTripFinish(
 
 	const channel = client.channels.cache.get(channelID);
 
-	sendToChannelID(client, channelID, { content: message, image: attachable }).then(() => {
-		const minutes = Math.min(30, data.duration / Time.Minute);
-		const randomEventChance = 60 - minutes;
-		if (
-			channel &&
-			!user.bitfield.includes(BitField.DisabledRandomEvents) &&
-			roll(randomEventChance) &&
-			channel instanceof TextChannel
-		) {
-			triggerRandomEvent(channel, user);
-		}
+	const msg = await sendToChannelID(client, channelID, {
+		content: message,
+		image: attachable,
+		components: components.reverse()
 	});
 
-	if (!onContinue && !clueReceived) return;
-
-	const existingCollector = collectors.get(user.id);
-
-	if (existingCollector) {
-		existingCollector.stop();
-		collectors.delete(user.id);
+	const minutes = Math.min(30, data.duration / Time.Minute);
+	const randomEventChance = 60 - minutes;
+	if (
+		channel &&
+		!user.bitfield.includes(BitField.DisabledRandomEvents) &&
+		roll(randomEventChance) &&
+		channel instanceof TextChannel
+	) {
+		triggerRandomEvent(channel, user);
 	}
 
-	if (!channelIsSendable(channel)) return;
-	const collector = new MessageCollector(channel, {
-		filter: (mes: Message) =>
-			mes.author === user && (mes.content.toLowerCase() === 'c' || stringMatches(mes.content, continuationChar)),
-		time: perkTier > PerkTier.One ? Time.Minute * 10 : Time.Minute * 2,
-		max: 1
+	if ((!onContinue && !clueReceived) || !msg) return;
+
+	const res = await msg.awaitMessageComponentInteraction({
+		filter: i => i.customID === 'repeat_trip' && i.user.id === user.id
 	});
 
-	collectors.set(user.id, collector);
+	if (!channelIsSendable(channel)) return;
 
-	collector.on('collect', async (mes: KlasaMessage) => {
-		if (user.minionIsBusy || client.oneCommandAtATimeCache.has(mes.author.id)) {
-			collector.stop();
-			collectors.delete(user.id);
+	// const collector = new MessageCollector(channel, {
+	// 	filter: (mes: Message) =>
+	// 		mes.author === user && (mes.content.toLowerCase() === 'c' || stringMatches(mes.content, continuationChar)),
+	// 	time: perkTier > PerkTier.One ? Time.Minute * 10 : Time.Minute * 2,
+	// 	max: 1
+	// });
+
+	if (res) {
+		res.update({ components: [] });
+		if (user.minionIsBusy || client.oneCommandAtATimeCache.has(res.user.id)) {
 			return;
 		}
-		client.oneCommandAtATimeCache.add(mes.author.id);
+		client.oneCommandAtATimeCache.add(res.user.id);
 		try {
-			if (mes.content.toLowerCase() === 'c' && clueReceived && perkTier > PerkTier.One) {
-				(client.commands.get('minion') as unknown as MinionCommand).clue(mes, [1, clueReceived.name]);
+			const fakeMessage = deepClone(msg);
+			fakeMessage.author = res.user;
+			if (clueReceived && perkTier > PerkTier.One) {
+				(client.commands.get('minion') as unknown as MinionCommand).clue(msg, [1, clueReceived.name]);
 				return;
-			} else if (onContinue && stringMatches(mes.content, continuationChar)) {
-				await onContinue(mes).catch(err => {
+			} else if (onContinue) {
+				await onContinue(msg).catch(err => {
 					channel.send(err);
 				});
 			}
@@ -115,7 +129,7 @@ export async function handleTripFinish(
 			console.log(err);
 			channel.send(err);
 		} finally {
-			setTimeout(() => client.oneCommandAtATimeCache.delete(mes.author.id), 300);
+			setTimeout(() => client.oneCommandAtATimeCache.delete(res.user.id), 300);
 		}
-	});
+	}
 }
