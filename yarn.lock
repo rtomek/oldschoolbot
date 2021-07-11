@@ -781,7 +781,7 @@
   resolved "https://registry.yarnpkg.com/@klasa/utils/-/utils-0.0.4.tgz#4bf010b09d0f93b39245523ed22a09571d56508c"
   integrity sha512-9gZSGN/As3sxZumZ9ZwyQ+KcNSenzY8tR1orRakv8HKK0WH0gG7QrsP/1O2TD4uHxUyr8dysCjt73RYPfzuDWQ==
 
-"@mapbox/node-pre-gyp@^1.0.0":
+"@mapbox/node-pre-gyp@^1.0.0", "@mapbox/node-pre-gyp@^1.0.4":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.5.tgz#2a0b32fcb416fb3f2250fd24cb2a81421a4f5950"
   integrity sha512-4srsKPXWlIxp5Vbqz5uLfBN+du2fJChBoYn/f2h991WLdk7jUvcSk/McVLSv/X+xQIPI8eGD5GjrnygdyHnhPA==
@@ -1150,6 +1150,13 @@
   version "2.1.5"
   resolved "https://registry.yarnpkg.com/@types/prettier/-/prettier-2.1.5.tgz#b6ab3bba29e16b821d84e09ecfaded462b816b00"
   integrity sha512-UEyp8LwZ4Dg30kVU2Q3amHHyTn1jEdhCIE59ANed76GaT1Vp76DD3ZWSAxgCrw6wJ0TqeoBpqmfUHiUDPs//HQ==
+
+"@types/skia-canvas@^0.9.1":
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/@types/skia-canvas/-/skia-canvas-0.9.1.tgz#5ff1d6d7c2f6360d3066a8264487734022b452a5"
+  integrity sha512-qzJRUJmqiP78jnRE1o5zt9hrDwuqFrT8D+7KcQoR58EgyGunadGtyjDn97SACvsHcHtkbliWLWCcSjCjhMJKKQ==
+  dependencies:
+    "@types/node" "*"
 
 "@types/stack-utils@^2.0.0":
   version "2.0.0"
@@ -2168,6 +2175,13 @@ decompress-response@^4.2.0:
   dependencies:
     mimic-response "^2.0.0"
 
+decompress-response@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-6.0.0.tgz#ca387612ddb7e104bd16d85aab00d5ecf09c66fc"
+  integrity sha512-aW35yZM6Bb/4oJlZncMH2LCoZtJXTRxES17vE3hoRiowU2kWHaJKFkSBDnDR+cm9J+9QhXmREyIfv0pji9ejCQ==
+  dependencies:
+    mimic-response "^3.1.0"
+
 dedent@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
@@ -3159,6 +3173,18 @@ glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
   version "7.1.6"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.6.tgz#141f33b81a7c2492e125594307480c46679278a6"
   integrity sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==
+  dependencies:
+    fs.realpath "^1.0.0"
+    inflight "^1.0.4"
+    inherits "2"
+    minimatch "^3.0.4"
+    once "^1.3.0"
+    path-is-absolute "^1.0.0"
+
+glob@^7.1.7:
+  version "7.1.7"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.7.tgz#3b193e9233f01d42d0b3f78294bbeeb418f94a90"
+  integrity sha512-OvD9ENzPLbegENnYP5UUfJIirTg4+XwMWGaQfQTY0JenxNvvIKP3U3/tAQSPIu/lHxXYSZmpXlUHeqAIdKzBLQ==
   dependencies:
     fs.realpath "^1.0.0"
     inflight "^1.0.4"
@@ -4556,6 +4582,11 @@ mimic-response@^2.0.0:
   resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-2.1.0.tgz#d13763d35f613d09ec37ebb30bac0469c0ee8f43"
   integrity sha512-wXqjST+SLt7R009ySCglWBCFpjUygmCIfD790/kVbiGmUgfYGuB14PiTd5DwVxSV4NcYHjzMkoj5LjQZwTQLEA==
 
+mimic-response@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/mimic-response/-/mimic-response-3.1.0.tgz#2d1d59af9c1b129815accc2c46a022a5ce1fa3c9"
+  integrity sha512-z0yWI+4FDrrweS8Zmt4Ej5HdJmky15+L2e6Wgn3+iK5fWzb6T3fhNFq2+MeTRb064c6Wr4N/wv0DzQTjNzHNGQ==
+
 minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
@@ -4965,6 +4996,11 @@ parent-require@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/parent-require/-/parent-require-1.0.0.tgz#746a167638083a860b0eef6732cb27ed46c32977"
   integrity sha1-dGoWdjgIOoYLDu9nMssn7UbDKXc=
+
+parenthesis@^3.1.5:
+  version "3.1.7"
+  resolved "https://registry.yarnpkg.com/parenthesis/-/parenthesis-3.1.7.tgz#01c89b603a2a6a262ec47554e74ed154a9be2aa6"
+  integrity sha512-iMtu+HCbLXVrpf6Ys/4YKhcFxbux3xK4ZVB9r+a2kMSqeeQWQoDNYlXIsOjwlT2ldYXZ3k5PVeBnYn7fbAo/Bg==
 
 parse-json@^4.0.0:
   version "4.0.0"
@@ -5777,10 +5813,29 @@ simple-get@^3.0.3:
     once "^1.3.1"
     simple-concat "^1.0.0"
 
+simple-get@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/simple-get/-/simple-get-4.0.0.tgz#73fa628278d21de83dadd5512d2cc1f4872bd675"
+  integrity sha512-ZalZGexYr3TA0SwySsr5HlgOOinS4Jsa8YB2GJ6lUNAazyAu4KG/VmzMTwAt2YVXzzVj8QmefmAonZIK2BSGcQ==
+  dependencies:
+    decompress-response "^6.0.0"
+    once "^1.3.1"
+    simple-concat "^1.0.0"
+
 sisteransi@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.5.tgz#134d681297756437cc05ca01370d3a7a571075ed"
   integrity sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==
+
+skia-canvas@^0.9.22:
+  version "0.9.22"
+  resolved "https://registry.yarnpkg.com/skia-canvas/-/skia-canvas-0.9.22.tgz#8b02b992007bbaa83d7a99a2d5e41bc54539f5d3"
+  integrity sha512-m5e+ur7K6KY+CkZwSF+cJAS6jMfMKIPj20TZnswcCxeVj8v7IknaLCyfWYI21yc/ccn2ZGFfEkvlx1Aw6Cy2iA==
+  dependencies:
+    "@mapbox/node-pre-gyp" "^1.0.4"
+    glob "^7.1.7"
+    simple-get "^4.0.0"
+    string-split-by "^1.0.0"
 
 slash@^3.0.0:
   version "3.0.0"
@@ -6005,6 +6060,13 @@ string-similarity@^4.0.1:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/string-similarity/-/string-similarity-4.0.4.tgz#42d01ab0b34660ea8a018da8f56a3309bb8b2a5b"
   integrity sha512-/q/8Q4Bl4ZKAPjj8WerIBJWALKkaPRfrvhfF8k/B23i4nzrlRj2/go1m90In7nG/3XDSbOo0+pu6RvCTM9RGMQ==
+
+string-split-by@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/string-split-by/-/string-split-by-1.0.0.tgz#53895fb3397ebc60adab1f1e3a131f5372586812"
+  integrity sha512-KaJKY+hfpzNyet/emP81PJA9hTVSfxNLS9SFTWxdCnnW1/zOOwiV248+EfoX7IQFcBaOp4G5YE6xTJMF+pLg6A==
+  dependencies:
+    parenthesis "^3.1.5"
 
 string-width@^1.0.1:
   version "1.0.2"

@@ -1,10 +1,10 @@
-import { Image } from 'canvas';
 import { FSWatcher } from 'chokidar';
 import { MessageEmbed, MessageOptions, MessagePayload } from 'discord.js';
 import { KlasaMessage, KlasaUser, Settings, SettingsUpdateResult } from 'klasa';
 import {} from 'node:process';
 import { Bank, Player } from 'oldschooljs';
 import PQueue from 'p-queue';
+import { Image } from 'skia-canvas';
 import { CommentStream, SubmissionStream } from 'snoostorm';
 import { Connection } from 'typeorm';
 

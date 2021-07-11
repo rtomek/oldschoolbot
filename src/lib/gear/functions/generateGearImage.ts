@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/restrict-plus-operands */
-import { Canvas, createCanvas } from 'canvas';
 import * as fs from 'fs';
 import { KlasaClient, KlasaUser } from 'klasa';
 import { EquipmentSlot } from 'oldschooljs/dist/meta/types';
+import { Canvas } from 'skia-canvas';
 
 import BankImageTask from '../../../tasks/bankImage';
 import { UserSettings } from '../../settings/types/UserSettings';
@@ -78,10 +78,12 @@ export async function generateGearImage(
 
 	const gearStats = gearSetup.stats;
 	const gearTemplateImage = await canvasImageFromBuffer(gearTemplateFile);
-	const canvas = createCanvas(gearTemplateImage.width, gearTemplateImage.height);
+	const canvas = new Canvas(gearTemplateImage.width, gearTemplateImage.height);
 	const ctx = canvas.getContext('2d');
 	ctx.imageSmoothingEnabled = false;
 	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+	// @ts-ignore
 	ctx.drawImage(userBg, (canvas.width - userBg.width) * 0.5, (canvas.height - userBg.height) * 0.5);
 	ctx.drawImage(gearTemplateImage, 0, 0, gearTemplateImage.width, gearTemplateImage.height);
 	bankTask?.drawBorder(canvas, false);
@@ -212,5 +214,5 @@ export async function generateGearImage(
 		}
 	}
 
-	return canvas.toBuffer();
+	return canvas.toBuffer('png');
 }

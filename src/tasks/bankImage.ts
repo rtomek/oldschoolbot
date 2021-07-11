@@ -1,10 +1,10 @@
-import { Canvas, createCanvas, Image, registerFont } from 'canvas';
 import * as fs from 'fs';
 import { KlasaUser, Task, TaskStore, util } from 'klasa';
 import fetch from 'node-fetch';
 import { Bank } from 'oldschooljs';
 import { toKMB } from 'oldschooljs/dist/util/util';
 import * as path from 'path';
+import { Canvas, FontLibrary, Image, loadImage } from 'skia-canvas';
 
 import { bankImageCache, Events } from '../lib/constants';
 import { allCollectionLogItems } from '../lib/data/collectionLog';
@@ -24,12 +24,18 @@ import {
 	saveCtx,
 	sha256Hash
 } from '../lib/util';
-import { canvasImageFromBuffer, canvasToBufferAsync, fillTextXTimesInCtx } from '../lib/util/canvasUtil';
+import { fillTextXTimesInCtx } from '../lib/util/canvasUtil';
 
-registerFont('./src/lib/resources/osrs-font.ttf', { family: 'Regular' });
-registerFont('./src/lib/resources/osrs-font-compact.otf', { family: 'Regular' });
-registerFont('./src/lib/resources/osrs-font-bold.ttf', { family: 'Regular' });
+function canvasImageFromBuffer(imageBuffer: Buffer): Promise<Image> {
+	return loadImage(imageBuffer);
+}
 
+console.log(
+	FontLibrary.use(['./src/lib/resources/osrs-font.ttf']),
+	FontLibrary.use(['./src/lib/resources/osrs-font-compact.otf']),
+	FontLibrary.use(['./src/lib/resources/osrs-font-bold.ttf'])
+);
+// console.log(FontLibrary.families);
 const bankImageFile = fs.readFileSync('./src/lib/resources/images/bank_backgrounds/1.jpg');
 const bankRepeaterFile = fs.readFileSync('./src/lib/resources/images/bank_backgrounds/r1.jpg');
 
@@ -87,6 +93,7 @@ export default class BankImageTask extends Task {
 
 		this.repeatingImage = await canvasImageFromBuffer(bankRepeaterFile);
 
+		// @ts-ignore 2345
 		this.backgroundImages = await Promise.all(
 			backgroundImages.map(async img => ({
 				...img,
@@ -167,11 +174,13 @@ export default class BankImageTask extends Task {
 	drawBorder(canvas: Canvas, titleLine = true) {
 		const ctx = canvas.getContext('2d');
 		// Draw top border
+		// @ts-ignore 2345
 		ctx.fillStyle = ctx.createPattern(this.borderHorizontal, 'repeat-x');
 		ctx.fillRect(0, 0, canvas.width, this.borderHorizontal!.height);
 
 		// Draw bottom border
 		ctx.save();
+		// @ts-ignore 2345
 		ctx.fillStyle = ctx.createPattern(this.borderHorizontal, 'repeat-x');
 		ctx.translate(0, canvas.height);
 		ctx.scale(1, -1);
@@ -181,6 +190,7 @@ export default class BankImageTask extends Task {
 		// Draw title line
 		if (titleLine) {
 			ctx.save();
+			// @ts-ignore 2345
 			ctx.fillStyle = ctx.createPattern(this.borderHorizontal, 'repeat-x');
 			ctx.translate(this.borderVertical!.width, 27);
 			ctx.fillRect(0, 0, canvas.width, this.borderHorizontal!.height);
@@ -189,12 +199,14 @@ export default class BankImageTask extends Task {
 
 		// Draw left border
 		ctx.save();
+		// @ts-ignore 2345
 		ctx.fillStyle = ctx.createPattern(this.borderVertical, 'repeat-y');
 		ctx.translate(0, this.borderVertical!.width);
 		ctx.fillRect(0, 0, this.borderVertical!.width, canvas.height);
 		ctx.restore();
 
 		// Draw right border
+		// @ts-ignore 2345
 		ctx.fillStyle = ctx.createPattern(this.borderVertical, 'repeat-y');
 		ctx.save();
 		ctx.translate(canvas.width, 0);
@@ -206,21 +218,21 @@ export default class BankImageTask extends Task {
 		// Top left
 		ctx.save();
 		ctx.translate(0, 0);
-		ctx.scale(1, 1);
+		ctx.scale(1, 1); // @ts-ignore 2345
 		ctx.drawImage(this.borderCorner, 0, 0);
 		ctx.restore();
 
 		// Top right
 		ctx.save();
 		ctx.translate(canvas.width, 0);
-		ctx.scale(-1, 1);
+		ctx.scale(-1, 1); // @ts-ignore 2345
 		ctx.drawImage(this.borderCorner, 0, 0);
 		ctx.restore();
 
 		// Bottom right
 		ctx.save();
 		ctx.translate(canvas.width, canvas.height);
-		ctx.scale(-1, -1);
+		ctx.scale(-1, -1); // @ts-ignore 2345
 		ctx.drawImage(this.borderCorner, 0, 0);
 		ctx.restore();
 
@@ -228,6 +240,7 @@ export default class BankImageTask extends Task {
 		ctx.save();
 		ctx.translate(0, canvas.height);
 		ctx.scale(1, -1);
+		// @ts-ignore 2345
 		ctx.drawImage(this.borderCorner, 0, 0);
 		ctx.restore();
 	}
@@ -324,6 +337,7 @@ export default class BankImageTask extends Task {
 			Object.keys(bank.bank).some(i => !currentCL[i] && allCollectionLogItems.includes(parseInt(i)));
 
 		if (isPurple) {
+			// @ts-ignore 2345
 			bgImage = { ...bgImage, image: await canvasImageFromBuffer(coxPurpleBg) };
 		}
 
@@ -356,7 +370,7 @@ export default class BankImageTask extends Task {
 			};
 		}
 
-		const canvas = createCanvas(width, bankBackgroundID === 1 ? canvasHeight : Math.max(331, canvasHeight));
+		const canvas = new Canvas(width, bankBackgroundID === 1 ? canvasHeight : Math.max(331, canvasHeight));
 
 		const ctx = canvas.getContext('2d');
 		ctx.font = '16px OSRSFontCompact';
@@ -365,6 +379,7 @@ export default class BankImageTask extends Task {
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 		if (!isTransparent) {
+			// @ts-ignore 2540
 			ctx.fillStyle = ctx.createPattern(bgImage.repeatImage ?? this.repeatingImage, 'repeat');
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 		}
@@ -375,6 +390,7 @@ export default class BankImageTask extends Task {
 
 		if (bankBackgroundID !== 20) {
 			ctx.drawImage(
+				// @ts-ignore 2345
 				bgImage!.image,
 				0,
 				0,
@@ -476,11 +492,7 @@ export default class BankImageTask extends Task {
 			}
 		}
 
-		// const args =
-		// 	!isTransparent && items.length > 2000
-		// 		? ['image/jpeg', { quality: 0.75 }]
-		// 		: ['image/png'];
-		const image = await canvasToBufferAsync(canvas, 'image/png');
+		const image = await canvas.toBuffer('png');
 
 		return {
 			image,
@@ -492,7 +504,7 @@ export default class BankImageTask extends Task {
 
 	async generateCollectionLogImage(collectionLog: ItemBank, title = '', type: any): Promise<Buffer> {
 		const spacer = 12;
-		const canvas = createCanvas(488, 331);
+		const canvas = new Canvas(488, 331);
 		const ctx = canvas.getContext('2d');
 		ctx.font = '16px OSRSFontCompact';
 		ctx.imageSmoothingEnabled = false;
@@ -571,8 +583,9 @@ export default class BankImageTask extends Task {
 			if (row > 6) {
 				const state = saveCtx(ctx);
 				const temp = ctx.getImageData(0, 0, canvas.width, canvas.height - 10);
+				// @ts-ignore 2540
 				canvas.height += itemSize + spacer;
-
+				// @ts-ignore 2540
 				ctx.fillStyle = ctx.createPattern(repeaterImage, 'repeat');
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -603,6 +616,6 @@ export default class BankImageTask extends Task {
 		// Draw border
 		this.drawBorder(canvas);
 
-		return canvas.toBuffer();
+		return canvas.toBuffer('png');
 	}
 }

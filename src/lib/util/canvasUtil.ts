@@ -1,4 +1,4 @@
-import { Canvas, CanvasRenderingContext2D, Image } from 'canvas';
+import { Canvas, CanvasRenderingContext2D, Image, loadImage } from 'skia-canvas';
 
 import { formatItemStackQuantity, generateHexColorForCashStack } from '../util';
 
@@ -9,7 +9,7 @@ export function fillTextXTimesInCtx(
 	y: number,
 	numberOfTimes = 3
 ) {
-	for (let i = 0; i < numberOfTimes; i++) {
+	for (let i = 0; i < 1; i++) {
 		ctx.fillText(text, x, y);
 	}
 }
@@ -39,13 +39,7 @@ export function drawTitleText(ctx: CanvasRenderingContext2D, title: string, x: n
 }
 
 export function canvasImageFromBuffer(imageBuffer: Buffer): Promise<Image> {
-	return new Promise((resolve, reject) => {
-		const canvasImage = new Image();
-
-		canvasImage.onload = () => resolve(canvasImage);
-		canvasImage.onerror = () => reject(new Error('Failed to load image.'));
-		canvasImage.src = imageBuffer;
-	});
+	return loadImage(imageBuffer);
 }
 
 export function canvasToBufferAsync(canvas: Canvas, ...args: any[]) {
