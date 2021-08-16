@@ -2,6 +2,7 @@ import { captureException } from '@sentry/node';
 import { Util } from 'discord.js';
 import { Gateway, KlasaClient, Settings } from 'klasa';
 import { getConnection } from 'typeorm';
+import { EntityFieldsNames } from 'typeorm/common/EntityFieldsNames';
 
 import { client } from '../..';
 import { MinigameKey, Minigames } from '../../extendables/User/Minigame';
@@ -27,6 +28,19 @@ export async function getNewUser(id: string): Promise<NewUserTable> {
 		await value.save();
 	}
 	return value;
+}
+
+type UpdateableUserKey = EntityFieldsNames<Omit<NewUserTable, 'id' | 'minigames' | 'slayerTasks'>>;
+export async function updateNewUserSetting({
+	userID,
+	key,
+	newData
+}: {
+	userID: string;
+	key: UpdateableUserKey;
+	newData: any;
+}) {
+	const randomCharacter = await NewUserTable.getRepository().createQueryBuilder('user').update();
 }
 
 export async function syncNewUserUsername(id: string, username: string) {
