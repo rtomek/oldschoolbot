@@ -63,7 +63,11 @@ export default class extends Task {
 		let files = [];
 		const specialMonkeys = monkeys.filter(m => m.special);
 		for (const monkey of specialMonkeys) {
-			const unique = rewardTable.roll();
+			let unique = rewardTable.roll();
+			const cl = new Bank(user.settings.get(UserSettings.CollectionLogBank));
+			if (unique.has('Monkey egg') && cl.has('Monkey egg') && !roll(cl.amount('Monkey egg'))) {
+				unique = rewardTable.roll();
+			}
 			if (roll(4) && monkeyTier === 5) {
 				loot.add('Marimbo statue');
 			}
