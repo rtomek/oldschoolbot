@@ -49,12 +49,11 @@ export default class extends Task {
 	async run(data: CyclopsActivityTaskOptions) {
 		const { userID, channelID, quantity } = data;
 		const user = await this.client.fetchUser(userID);
-		const userBank = new Bank(user.settings.get(UserSettings.Bank));
 
 		let loot = new Bank();
 
 		for (let i = 0; i < quantity; i++) {
-			const highestDefenderOwned = defenders.find(def => userBank.has(def.itemID) || loot.has(def.itemID));
+			const highestDefenderOwned = defenders.find(def => user.hasItemEquippedOrInBank(def.itemID) || loot.has(def.itemID));
 			const possibleDefenderToDrop =
 				defenders[
 					Math.max(
